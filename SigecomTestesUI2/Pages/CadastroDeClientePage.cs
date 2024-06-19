@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium.Appium.Windows;
+﻿using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Windows;
+using SigecomTestesUI2.Sigecom.Cadastros;
 
 namespace SigecomTestesUI2.Pages
 {
@@ -41,7 +43,6 @@ namespace SigecomTestesUI2.Pages
         private const string CampoTipoContato = "cbxPessoaContatoTipo";
         private const string CampoBairro = "txtBairro";
         private const string CampoDescontoPadrao = "txtDescontoPadraoCliente";
-        private const string CampoTabelaDePreco = "cbxTabelaPreco";
         private const string CampoGrupo = "cbxGrupoPessoa";
 
         public void AcessarItemMenu()
@@ -83,8 +84,72 @@ namespace SigecomTestesUI2.Pages
                 _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoCidade, cidade);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public bool PreencherCadastroCompleto(CadastroDeClienteCompletoDados dados)
+        {
+            try
+            {
+                _manipuladorService.DigitarNoCampoId(CampoNome, dados.nome);
+                _manipuladorService.DigitarNoCampoId(CampoCpf, dados.cpf);
+                _manipuladorService.DigitarNoCampoId(CampoRg, dados.rg);
+                _manipuladorService.DigitarNoCampoId(CampoApelido, dados.apelido);
+                _manipuladorService.SelecionarItemComboBox(CampoSexo, dados.sexo);
+                _manipuladorService.DigitarNoCampoId(CampoDataDeNascimento, dados.dataNascimento);
+                _manipuladorService.SelecionarItemComboBox(CampoEstadoCivil, dados.estadoCivil);
+                _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoCep, dados.cep);
+                _manipuladorService.EsperarAcaoEmSegundos(2);
+                _manipuladorService.DigitarNoCampoId(CampoNumero, dados.numero);
+                _manipuladorService.DigitarNoCampoId(CampoComplemento, dados.complemento);
+                _manipuladorService.DigitarNoCampoId(CampoContatos, dados.contatoPessoa);
+                _manipuladorService.DigitarNoCampoId(CampoDescontoPadrao, dados.descontoPadrao);
+                _manipuladorService.DigitarNoCampoId(CampoObservacao, dados.observacao);
+                CadastrarGrupoDeDesconto(dados.sqlCadastroDeGrupoDeDesconto);
+                _manipuladorService.SelecionarItemComboBox(CampoGrupo, dados.posicaoGrupo);
+                _manipuladorService.SelecionarItemComboBox(CampoTipoContato, dados.posicaoTipoContato);
+                _manipuladorService.DigitarNoCampoId(CampoContatoDoCliente, dados.contato);
+                _manipuladorService.DigitarNoCampoId(CampoObsContatoDoCliente, dados.observacaoContato);
+                _manipuladorService.ClicarBotaoId(BotaoContato);
+                _manipuladorService.DigitarNoCampoId(CampoAvisoDeVenda, dados.avisoDeVenda);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public bool PreencherCadastroPessoaJuridica(string cnpj)
+        {
+            try
+            {
+                _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoCpf, cnpj);
+                _manipuladorService.EsperarAcaoEmSegundos(2);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public bool SelecionarClassificacao(int posicao)
+        {
+            try
+            {
+                _manipuladorService.SelecionarItemComboBox(CampoTipoPessoa, posicao);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
                 return false;
             }
         }
@@ -103,9 +168,9 @@ namespace SigecomTestesUI2.Pages
                 CompararValorDoCampoId(CampoCidade, cidade);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
                 return false;
             }
         }
@@ -113,6 +178,25 @@ namespace SigecomTestesUI2.Pages
         public void CompararValorDoCampoId(string campo, string valor)
         {
             Assert.AreEqual(_manipuladorService.ObterValorElementoId(campo), valor);
+        }
+
+        public bool CadastrarGrupoDeDesconto(string script)
+        {
+            try
+            {
+                var db = new AcessoDB();
+                var consulta = db.RealizarConsulta("select * from pessoa_grupo where nomegrupo = 'grupo teste' and desconto_maximo = 15.00");
+                if (consulta.Rows.Count == 0)
+                {
+                    db.ExecutarScript(script);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
     }
 }
