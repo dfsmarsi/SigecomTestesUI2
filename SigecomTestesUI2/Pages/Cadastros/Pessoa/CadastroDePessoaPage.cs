@@ -1,23 +1,27 @@
-﻿using OpenQA.Selenium.Appium;
-using OpenQA.Selenium.Appium.Windows;
-using SigecomTestesUI2.Sigecom.Cadastros;
+﻿using OpenQA.Selenium.Appium.Windows;
+using SigecomTestesUI2.Enum;
+using SigecomTestesUI2.Sigecom.Cadastros.Cliente.Model;
 
-namespace SigecomTestesUI2.Pages
+namespace SigecomTestesUI2.Pages.Cadastros.Pessoa
 {
-    public class CadastroDeClientePage : PageBase
+    public class CadastroDePessoaPage : PageBase
     {
-        public CadastroDeClientePage(WindowsDriver<WindowsElement> driver) : base(driver)
+        public CadastroDePessoaPage(WindowsDriver<WindowsElement> driver) : base(driver)
         {
         }
 
         private const string TelaCadastroCliente = "Cadastro de clientes";
+        private const string TelaCadastroColaborador = "Cadastro de colaboradores";
+        private const string TelaCadastroFornecedor = "Cadastro de fornecedores";
         private const string BotaoMenuCadastro = "Cadastro";
         private const string BotaoSubMenuClientes = "Clientes";
+        private const string BotaoSubMenuColaborador = "Colaboradores";
+        private const string BotaoSubMenuFornecedor = "Fornecedores";
         private const string BotaoNovo = "F2 - Novo";
         private const string BotaoGravar = "F5 - Gravar";
         private const string BotaoPesquisar = "F9 - Pesquisar";
         private const string BotaoContato = "btnAddContato";
-        private const string CampoTipoPessoa = "cbxPessoaClassificacao";
+        private const string CampoClassificacaoPessoa = "cbxPessoaClassificacao";
         private const string CampoNacionalidade = "cbxNacionalidade";
         private const string CampoNome = "txtNome";
         private const string CampoCpf = "cpfCnpjButtonEdit";
@@ -50,29 +54,39 @@ namespace SigecomTestesUI2.Pages
             _manipuladorService.DarDuploCliqueNoBotaoName(BotaoMenuCadastro);
         }
 
-        public void AcessarItemSubMenu()
+        public void AcessarItemSubMenu(TipoPessoa tipoPessoa)
         {
-            _manipuladorService.ClicarNoBotaoName(BotaoSubMenuClientes);
+            if(tipoPessoa == TipoPessoa.Cliente)
+                _manipuladorService.ClicarNoBotaoName(BotaoSubMenuClientes);
+            else if(tipoPessoa == TipoPessoa.Colaborador)
+                _manipuladorService.ClicarNoBotaoName(BotaoSubMenuColaborador);
+            else if (tipoPessoa == TipoPessoa.Fornecedor)
+                _manipuladorService.ClicarNoBotaoName(BotaoSubMenuFornecedor);
         }
 
-        public void AbrirPesquisaDeCliente()
+        public void AbrirPesquisaDePessoa()
         {
             _manipuladorService.ClicarNoBotaoName(BotaoPesquisar);
         }
 
-        public void ClicarNoBotaoNovoCadastroDeCliente()
+        public void ClicarNoBotaoNovoCadastroDePessoa()
         {
             _manipuladorService.ClicarNoBotaoName(BotaoNovo);
         }
 
-        public void GravarCadastroDeCliente()
+        public void GravarCadastroDePessoa()
         {
             _manipuladorService.ClicarNoBotaoName(BotaoGravar);
         }
 
-        public void FecharTelaDeCadastroDeClienteEsc()
-        {
-            _manipuladorService.FecharJanelaComEscName(TelaCadastroCliente);
+        public void FecharTelaDeCadastroDePessoaEsc(TipoPessoa tipoPessoa)
+        {            
+            if (tipoPessoa == TipoPessoa.Cliente)
+                _manipuladorService.FecharJanelaComEscName(TelaCadastroCliente);
+            else if (tipoPessoa == TipoPessoa.Colaborador)
+                _manipuladorService.FecharJanelaComEscName(TelaCadastroColaborador);
+            else if (tipoPessoa == TipoPessoa.Fornecedor)
+                _manipuladorService.FecharJanelaComEscName(TelaCadastroFornecedor);
         }
 
         public bool PreencherCamposObrigatorios(string nome, string cidade, string estado)
@@ -91,31 +105,31 @@ namespace SigecomTestesUI2.Pages
             }
         }
 
-        public bool PreencherCadastroCompleto(CadastroDeClienteCompletoDados dados)
+        public bool PreencherCadastroCompleto(CadastroDeClienteCompletoModel dados)
         {
             try
             {
-                _manipuladorService.DigitarNoCampoId(CampoNome, dados.nome);
-                _manipuladorService.DigitarNoCampoId(CampoCpf, dados.cpf);
-                _manipuladorService.DigitarNoCampoId(CampoRg, dados.rg);
-                _manipuladorService.DigitarNoCampoId(CampoApelido, dados.apelido);
-                _manipuladorService.SelecionarItemComboBox(CampoSexo, dados.sexo);
-                _manipuladorService.DigitarNoCampoId(CampoDataDeNascimento, dados.dataNascimento);
-                _manipuladorService.SelecionarItemComboBox(CampoEstadoCivil, dados.estadoCivil);
-                _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoCep, dados.cep);
+                _manipuladorService.DigitarNoCampoId(CampoNome, dados.Nome);
+                _manipuladorService.DigitarNoCampoId(CampoCpf, dados.Cpf);
+                _manipuladorService.DigitarNoCampoId(CampoRg, dados.Rg);
+                _manipuladorService.DigitarNoCampoId(CampoApelido, dados.Apelido);
+                _manipuladorService.SelecionarItemComboBox(CampoSexo, dados.Sexo);
+                _manipuladorService.DigitarNoCampoId(CampoDataDeNascimento, dados.DataNascimento);
+                _manipuladorService.SelecionarItemComboBox(CampoEstadoCivil, dados.EstadoCivil);
+                _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoCep, dados.Cep);
                 _manipuladorService.EsperarAcaoEmSegundos(2);
-                _manipuladorService.DigitarNoCampoId(CampoNumero, dados.numero);
-                _manipuladorService.DigitarNoCampoId(CampoComplemento, dados.complemento);
-                _manipuladorService.DigitarNoCampoId(CampoContatos, dados.contatoPessoa);
-                _manipuladorService.DigitarNoCampoId(CampoDescontoPadrao, dados.descontoPadrao);
-                _manipuladorService.DigitarNoCampoId(CampoObservacao, dados.observacao);
-                CadastrarGrupoDeDesconto(dados.sqlCadastroDeGrupoDeDesconto);
-                _manipuladorService.SelecionarItemComboBox(CampoGrupo, dados.posicaoGrupo);
-                _manipuladorService.SelecionarItemComboBox(CampoTipoContato, dados.posicaoTipoContato);
-                _manipuladorService.DigitarNoCampoId(CampoContatoDoCliente, dados.contato);
-                _manipuladorService.DigitarNoCampoId(CampoObsContatoDoCliente, dados.observacaoContato);
+                _manipuladorService.DigitarNoCampoId(CampoNumero, dados.Numero);
+                _manipuladorService.DigitarNoCampoId(CampoComplemento, dados.Complemento);
+                _manipuladorService.DigitarNoCampoId(CampoContatos, dados.ContatoPessoa);
+                _manipuladorService.DigitarNoCampoId(CampoDescontoPadrao, dados.DescontoPadrao);
+                _manipuladorService.DigitarNoCampoId(CampoObservacao, dados.Observacao);
+                CadastrarGrupoDeDesconto(dados.SqlCadastroDeGrupoDeDesconto);
+                _manipuladorService.SelecionarItemComboBox(CampoGrupo, dados.PosicaoGrupo);
+                _manipuladorService.SelecionarItemComboBox(CampoTipoContato, dados.PosicaoTipoContato);
+                _manipuladorService.DigitarNoCampoId(CampoContatoDoCliente, dados.Contato);
+                _manipuladorService.DigitarNoCampoId(CampoObsContatoDoCliente, dados.ObservacaoContato);
                 _manipuladorService.ClicarBotaoId(BotaoContato);
-                _manipuladorService.DigitarNoCampoId(CampoAvisoDeVenda, dados.avisoDeVenda);
+                _manipuladorService.DigitarNoCampoId(CampoAvisoDeVenda, dados.AvisoDeVenda);
                 return true;
             }
             catch (Exception ex)
@@ -144,7 +158,7 @@ namespace SigecomTestesUI2.Pages
         {
             try
             {
-                _manipuladorService.SelecionarItemComboBox(CampoTipoPessoa, posicao);
+                _manipuladorService.SelecionarItemComboBox(CampoClassificacaoPessoa, posicao);
                 return true;
             }
             catch (Exception ex)
@@ -154,9 +168,9 @@ namespace SigecomTestesUI2.Pages
             }
         }
 
-        public string RetornarTipoPessoa()
+        public string RetornarClassificacaoPessoa()
         {
-            return _manipuladorService.ObterValorElementoId(CampoTipoPessoa);
+            return _manipuladorService.ObterValorElementoId(CampoClassificacaoPessoa);
         }
 
         public bool VerificarCamposObrigatorios(string nome, string cidade, string estado)

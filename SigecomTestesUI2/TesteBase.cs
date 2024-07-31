@@ -37,6 +37,7 @@ namespace SigecomTestesUI2
             if (Driver != null)
             {
                 Driver.Quit();
+                Driver.Dispose();
                 Driver = null;
             }
         }
