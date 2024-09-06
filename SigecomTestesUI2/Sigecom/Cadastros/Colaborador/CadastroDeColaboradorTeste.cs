@@ -1,5 +1,6 @@
 ﻿using SigecomTestesUI2.Pages.Cadastros.Pessoa;
 using SigecomTestesUI2.Pages.Pesquisas;
+using SigecomTestesUI2.Sigecom.Cadastros.Cliente.Model;
 using SigecomTestesUI2.Sigecom.Cadastros.Colaborador.Model;
 
 namespace SigecomTestesUI2.Sigecom.Cadastros.Colaborador
@@ -29,11 +30,18 @@ namespace SigecomTestesUI2.Sigecom.Cadastros.Colaborador
         }
 
         [Test(Description = "Cadastro de colaborador pessoa juridica")]
-        public void CadastroDeClientePessoaJuridica()
+        public void CadastroDeColaboradorPessoaJuridica()
         {
             var pageCadastro = new CadastroDePessoaPage(Driver);
             var pagePesquisa = new PesquisaDePessoaPage(Driver);
             var colaboradorJuridicoDados = new CadastroDeColaboradorJuridicoModel();
+
+            var db = new AcessoDB();
+            var consulta = db.RealizarConsulta(colaboradorJuridicoDados.ScriptPesquisaColaboradorPeloCnpj);
+            if (consulta.Rows.Count > 0)
+            {
+                db.ExecutarScript(colaboradorJuridicoDados.ScriptDesativarColaboradorRepetido);
+            }
 
             pageCadastro.AcessarItemMenu();
             pageCadastro.AcessarItemSubMenu(Enum.TipoPessoa.Colaborador);

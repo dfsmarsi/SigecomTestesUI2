@@ -4,7 +4,7 @@ using SigecomTestesUI2.Sigecom.Cadastros.Cliente.Model;
 
 namespace SigecomTestesUI2.Sigecom.Cadastros.Cliente
 {
-    public class CadastroDeColaboradorTeste : TesteBase
+    public class CadastroDeClienteTeste : TesteBase
     {
         [Test(Description = "Cadastro de cliente campos obrigatorios")]
         public void CadastroDeClienteCamposObrigatorios()
