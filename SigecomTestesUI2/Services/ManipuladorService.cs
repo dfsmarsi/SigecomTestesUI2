@@ -191,13 +191,7 @@ namespace SigecomTestesUI2.Services
         }
 
         public void ClicarNoToggleSwitchPeloId(string nomeDoCampo) =>
-            ClicarBotaoId(nomeDoCampo);
-
-        public void ClicarBotaoName(string nomeBotao) =>
-            _driver.FindElementByName(nomeBotao).Click();
-
-        public void ClicarBotaoId(string nomeBotao) =>
-            _driver.FindElementByAccessibilityId(nomeBotao).Click();
+            ClicarNoBotaoId(nomeDoCampo);
 
         public void EditarCampoComDuploCliqueNoBotaoId(string nomeBotao, string texto)
         {

@@ -128,7 +128,7 @@ namespace SigecomTestesUI2.Pages.Cadastros.Pessoa
                 _manipuladorService.SelecionarItemComboBox(CampoTipoContato, dados.PosicaoTipoContato);
                 _manipuladorService.DigitarNoCampoId(CampoContatoDoCliente, dados.Contato);
                 _manipuladorService.DigitarNoCampoId(CampoObsContatoDoCliente, dados.ObservacaoContato);
-                _manipuladorService.ClicarBotaoId(BotaoContato);
+                _manipuladorService.ClicarNoBotaoId(BotaoContato);
                 _manipuladorService.DigitarNoCampoId(CampoAvisoDeVenda, dados.AvisoDeVenda);
                 return true;
             }

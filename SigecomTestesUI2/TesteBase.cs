@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
+using SigecomTestesUI2.Pages.Login;
 using SigecomTestesUI2.Services;
 using System.Diagnostics;
 
@@ -24,9 +25,8 @@ namespace SigecomTestesUI2
             Driver = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appiumOptions);
             ManipuladorService = new ManipuladorService(Driver);
 
-            LoginDados dadosLogin = new LoginDados();
             LoginPage login = new LoginPage(Driver);
-            login.RealizarLogin(dadosLogin);
+            login.RealizarLogin();
         }
 
         [TearDown]
@@ -51,15 +51,20 @@ namespace SigecomTestesUI2
         {
             try
             {
-                ManipuladorService.ClicarNoBotaoName("Sair/Login");
-                ManipuladorService.TrocarParaProximaJanelaLogin();
-                ManipuladorService.ConfirmarSeElementoExisteName("Sistema de gestão comercial"); //tela de login
+                RealizarSairLogin();
                 ManipuladorService.ClicarNoBotaoName("Fechar"); // X da tela de login
             }
             catch (Exception)
             {
                 MatarProcessoSigecom();
             }
+        }
+
+        protected static void RealizarSairLogin()
+        {
+            ManipuladorService.ClicarNoBotaoName("Sair/Login");
+            ManipuladorService.TrocarParaProximaJanelaLogin();
+            ManipuladorService.ConfirmarSeElementoExisteName("Sistema de gestão comercial"); //tela de login
         }
 
         public static void MatarProcessoSigecom()

@@ -1,15 +1,11 @@
 ﻿using OpenQA.Selenium.Appium.Windows;
-using SigecomTestesUI2.Services;
 
-namespace SigecomTestesUI2
+namespace SigecomTestesUI2.Pages.Login
 {
-    public class LoginPage
+    public class LoginPage : PageBase
     {
-        private readonly ManipuladorService _manipuladorService;
-
-        public LoginPage(WindowsDriver<WindowsElement> driver)
+        public LoginPage(WindowsDriver<WindowsElement> driver) : base(driver)
         {
-            _manipuladorService = new ManipuladorService(driver);
         }
 
         private const string IdCampoUsuario = "txtUsuario";
@@ -18,8 +14,9 @@ namespace SigecomTestesUI2
         private const string NomeFrmPrincipal = "SIGECOM - Sistema de Gestão Comercial - Teste Ui - Qa";
         private const string IdFrmLogin = "FrmLogin";
 
-        public void RealizarLogin(LoginDados dadosLogin)
+        public void RealizarLogin()
         {
+            LoginDados dadosLogin = new LoginDados();
             try
             {
                 ValidarSeTelaDeLoginEstaAberta();
