@@ -1,4 +1,4 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Interactions;
 
@@ -13,48 +13,64 @@ namespace SigecomTestesUI2.Services
             _driver = driver;
         }
 
-        public void TrocarParaProximaJanela()
+        private T EsperarAte<T>(Func<T?> condicao, int timeoutSegundos = 10) where T : class
         {
-            try
+            var limite = DateTime.UtcNow.AddSeconds(timeoutSegundos);
+            while (DateTime.UtcNow < limite)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(2));
-                var allWindowHandles = _driver.WindowHandles;
-
-                if (allWindowHandles.Count > 0)
+                try
                 {
-                    _driver.SwitchTo().Window(allWindowHandles[0]);
+                    var resultado = condicao();
+                    if (resultado != null) return resultado;
                 }
-                else
-                {
-                    throw new WebDriverException("Não há janelas disponíveis para trocar.");
-                }
+                catch (WebDriverException) { }
+                Thread.Sleep(500);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao trocar de janela: {ex.Message}");
-            }
+            throw new TimeoutException($"Timeout de {timeoutSegundos}s atingido aguardando condição.");
         }
 
-        public void TrocarParaProximaJanelaLogin()
+        private void EsperarAte(Func<bool> condicao, int timeoutSegundos = 10)
         {
-            try
+            var limite = DateTime.UtcNow.AddSeconds(timeoutSegundos);
+            while (DateTime.UtcNow < limite)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(5));
-                var allWindowHandles = _driver.WindowHandles;
+                try
+                {
+                    if (condicao()) return;
+                }
+                catch (WebDriverException) { }
+                Thread.Sleep(500);
+            }
+            throw new TimeoutException($"Timeout de {timeoutSegundos}s atingido aguardando condição.");
+        }
 
-                if (allWindowHandles.Count > 0)
-                {
-                    _driver.SwitchTo().Window(allWindowHandles[0]);
-                }
-                else
-                {
-                    throw new WebDriverException("Não há janelas disponíveis para trocar.");
-                }
-            }
-            catch (Exception ex)
+        public void EsperarAteQue(Func<bool> condicao, int timeoutSegundos = 10) =>
+            EsperarAte(condicao, timeoutSegundos);
+
+        public void TrocarParaProximaJanela(int timeoutSegundos = 10)
+        {
+            EsperarAte(() =>
             {
-                Console.WriteLine($"Erro ao trocar de janela: {ex.Message}");
-            }
+                var handles = _driver.WindowHandles;
+                if (handles.Count == 0) return false;
+                _driver.SwitchTo().Window(handles[0]);
+                return true;
+            }, timeoutSegundos);
+        }
+
+        public WindowsElement EsperarElementoId(string id, int timeoutSegundos = 10)
+        {
+            return EsperarAte(() => _driver.FindElementByAccessibilityId(id), timeoutSegundos);
+        }
+
+        public WindowsElement EsperarElementoName(string nome, int timeoutSegundos = 10)
+        {
+            return EsperarAte(() => _driver.FindElementByName(nome), timeoutSegundos);
+        }
+
+        public void EsperarCampoPreenchidoId(string id, int timeoutSegundos = 10)
+        {
+            EsperarAte(() => !string.IsNullOrEmpty(_driver.FindElementByAccessibilityId(id).Text), timeoutSegundos);
         }
 
         public WindowsElement EncontrarElementoId(string idElemento) =>
@@ -95,14 +111,11 @@ namespace SigecomTestesUI2.Services
             return driverPageSource.Contains(nome);
         }
 
-        public void ConfirmarSeElementoExisteName(string valor)
+        public bool ElementoExisteNaTela(string nome)
         {
-            var elemento = EncontrarElementoName(valor);
-            Assert.AreEqual(elemento.Text, valor);
+            var elemento = EncontrarElementoName(nome);
+            return elemento.Text.Equals(nome);
         }
-
-        public void EsperarAcaoEmSegundos(int tempoEmSegundos) =>
-            Thread.Sleep(TimeSpan.FromSeconds(tempoEmSegundos));
 
         public void ClicarNoBotaoId(string nomeBotao) =>
             _driver.FindElementByAccessibilityId(nomeBotao).Click();
@@ -210,19 +223,18 @@ namespace SigecomTestesUI2.Services
             return elementoDaGridComName.Text.Equals(nome);
         }
 
-        public void CliqueNoElementoDaGridComVariosEVerificar(string nomeColuna, string nome)
-        {
-            var campoDaGrid = ObterPosicaoDoElementoNaGrid(nomeColuna, nome);
-            var elementoDaGridComName = ObterElementoDaGridComName(nomeColuna, campoDaGrid);
-            RealizarAcaoDeClicarNoCampoDaGrid(nome, elementoDaGridComName);
-            Assert.AreEqual(elementoDaGridComName.Text, nome);
-        }
-
-        public void CliqueNoElementoDaGridComVarios(string nomeColuna, string nome)
+        public void ClicarNoElementoDaGridComVarios(string nomeColuna, string nome)
         {
             var campoDaGrid = ObterPosicaoDoElementoNaGrid(nomeColuna, nome);
 
             RealizarAcaoDeClicarNoCampoDaGrid(nome, ObterElementoDaGridComName(nomeColuna, campoDaGrid));
+        }
+
+        public void ClicarNoElementoDaGridComVariosEApertarEnter(string nomeColuna, string nome)
+        {
+            var campoDaGrid = ObterPosicaoDoElementoNaGrid(nomeColuna, nome);
+
+            ClicarNoCampoDaGridEApertarEnter(nome, ObterElementoDaGridComName(nomeColuna, campoDaGrid));
         }
 
         public int RetornarPosicaoDoRegistroDesejado(string nomeColunaParaEncontrarValor, string valorParaSerEncontrado)
@@ -262,6 +274,15 @@ namespace SigecomTestesUI2.Services
             if (!botaoEncontrado.Text.Equals(nome)) return;
             var acao = new Actions(_driver);
             acao.Click(botaoEncontrado);
+            acao.Perform();
+        }
+
+        private void ClicarNoCampoDaGridEApertarEnter(string nome, IWebElement botaoEncontrado)
+        {
+            if (!botaoEncontrado.Text.Equals(nome)) return;
+            var acao = new Actions(_driver);
+            acao.Click(botaoEncontrado);
+            acao.SendKeys(Keys.Enter);
             acao.Perform();
         }
 

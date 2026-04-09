@@ -1,5 +1,4 @@
-﻿using OpenQA.Selenium.Appium.Windows;
-using SigecomTestesUI2.Services;
+﻿using SigecomTestesUI2.Services;
 
 namespace SigecomTestesUI2.Pages
 {
@@ -7,9 +6,9 @@ namespace SigecomTestesUI2.Pages
     {
         protected readonly ManipuladorService _manipuladorService;
 
-        public PageBase(WindowsDriver<WindowsElement> driver)
+        public PageBase(ManipuladorService manipuladorService)
         {
-            _manipuladorService = new ManipuladorService(driver);
+            _manipuladorService = manipuladorService;
         }
     }
 }

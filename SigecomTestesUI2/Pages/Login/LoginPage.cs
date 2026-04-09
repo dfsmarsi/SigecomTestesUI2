@@ -1,44 +1,31 @@
-﻿using OpenQA.Selenium.Appium.Windows;
+using SigecomTestesUI2.Services;
 
 namespace SigecomTestesUI2.Pages.Login
 {
     public class LoginPage : PageBase
     {
-        public LoginPage(WindowsDriver<WindowsElement> driver) : base(driver)
-        {
-        }
-
         private const string IdCampoUsuario = "txtUsuario";
         private const string IdCampoSenha = "txtSenha";
         private const string NomeBotaoAcessar = ", Acessar";
         private const string NomeFrmPrincipal = "SIGECOM - Sistema de Gestão Comercial - Teste Ui - Qa";
         private const string IdFrmLogin = "FrmLogin";
 
+        public LoginPage(ManipuladorService manipuladorService) : base(manipuladorService)
+        {
+        }
+
         public void RealizarLogin()
         {
             LoginDados dadosLogin = new LoginDados();
-            try
-            {
-                ValidarSeTelaDeLoginEstaAberta();
-                _manipuladorService.DigitarNoCampoId(IdCampoUsuario, dadosLogin.Usuario);
-                _manipuladorService.DigitarNoCampoId(IdCampoSenha, dadosLogin.Senha);
-                _manipuladorService.ClicarNoBotaoName(NomeBotaoAcessar);
-                _manipuladorService.TrocarParaProximaJanelaLogin();
-                ValidarSeLoginFoiRealizado();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao fazer login: {ex.Message}");
-            }
-        }
-        private void ValidarSeTelaDeLoginEstaAberta()
-        {
-            _manipuladorService.ObterValorElementoId(IdFrmLogin).Equals(IdFrmLogin);
+            _manipuladorService.EditarCampoComDuploCliqueNoBotaoId(IdCampoUsuario, dadosLogin.Usuario);
+            _manipuladorService.DigitarNoCampoIdEApertarEnter(IdCampoSenha, dadosLogin.Senha);
+            _manipuladorService.TrocarParaProximaJanela();
         }
 
-        private void ValidarSeLoginFoiRealizado()
-        {
-            _manipuladorService.ObterValorElementoName(NomeFrmPrincipal).Equals(NomeFrmPrincipal);
-        }
+        public bool TelaDeLoginEstaAberta() =>
+            _manipuladorService.ElementoExisteNaTela(IdFrmLogin);
+
+        public bool LoginFoiRealizado() =>
+            _manipuladorService.ElementoExisteNaTela(NomeFrmPrincipal);
     }
 }

@@ -1,83 +1,52 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.FirebirdClient;
 using System.Data;
 
 namespace SigecomTestesUI2
 {
-    class AcessoDB
+    public class AcessoDB : IDisposable
     {
-        private FbConnection _connection;
-        const string connectionString = "User=SYSDBA;Password=masterkey;Database=localhost:C:\\SISTEMASBR\\BANCOS\\TESTES\\UI.fdb;DataSource=localhost;Charset=NONE;";
+        private FbConnection? _connection;
 
         public AcessoDB()
         {
-            _connection = new FbConnection(connectionString);
-        }
-
-        public void Connect()
-        {
-            try
-            {
-                _connection.Open();
-                Console.WriteLine("Conexão com o banco de dados estabelecida.");
-            }
-            catch (FbException e)
-            {
-                Console.WriteLine($"Erro ao conectar ao banco de dados: {e.Message}");
-            }
-        }
-
-        public void Disconnect()
-        {
-            if (_connection != null && _connection.State == ConnectionState.Open)
-            {
-                _connection.Close();
-                Console.WriteLine("Conexão com o banco de dados fechada.");
-            }
+            _connection = new FbConnection(Configuracao.Instancia["Database:ConnectionString"]);
         }
 
         public void ExecutarScript(string script)
         {
+            _connection!.Open();
             try
             {
-                using (var command = new FbCommand(script, _connection))
-                {
-                    Connect();
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Script executado com sucesso.");
-                }
-            }
-            catch (FbException e)
-            {
-                Console.WriteLine($"Erro ao executar o script: {e.Message}");
+                using var command = new FbCommand(script, _connection);
+                command.ExecuteNonQuery();
             }
             finally
             {
-                Disconnect();
+                _connection.Close();
             }
         }
 
         public DataTable RealizarConsulta(string script)
         {
-            DataTable dataTable = new DataTable();
+            var dataTable = new DataTable();
+            _connection!.Open();
             try
             {
-                Connect();
-                using (var command = new FbCommand(script, _connection))
-                {
-                    FbDataAdapter adapter = new FbDataAdapter(command);
-                    adapter.Fill(dataTable);
-                    Console.WriteLine("Consulta realizada com sucesso.");
-                }
-            }
-            catch (FbException e)
-            {
-                Console.WriteLine($"Erro ao realizar consulta: {e.Message}");
+                using var command = new FbCommand(script, _connection);
+                var adapter = new FbDataAdapter(command);
+                adapter.Fill(dataTable);
             }
             finally
             {
-                Disconnect();
+                _connection.Close();
             }
             return dataTable;
+        }
+
+        public void Dispose()
+        {
+            _connection?.Dispose();
+            _connection = null;
         }
     }
 }

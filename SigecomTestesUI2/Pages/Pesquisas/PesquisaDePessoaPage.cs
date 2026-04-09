@@ -1,11 +1,11 @@
-﻿using OpenQA.Selenium.Appium.Windows;
-using SigecomTestesUI2.Enum;
+﻿using SigecomTestesUI2.Enum;
+using SigecomTestesUI2.Services;
 
 namespace SigecomTestesUI2.Pages.Pesquisas
 {
     public class PesquisaDePessoaPage : PageBase
     {
-        public PesquisaDePessoaPage(WindowsDriver<WindowsElement> driver) : base(driver)
+        public PesquisaDePessoaPage(ManipuladorService manipuladorService) : base(manipuladorService)
         {
         }
 
@@ -30,14 +30,21 @@ namespace SigecomTestesUI2.Pages.Pesquisas
         }
         public void PesquisarPessoa(TipoPessoa tipoPessoa, string nomePessoa)
         {
-            _manipuladorService.ConfirmarSeElementoExisteName(RetornarTipoDeTelaDePesquisa(tipoPessoa));
+            _manipuladorService.ElementoExisteNaTela(RetornarTipoDeTelaDePesquisa(tipoPessoa));
             _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoParametroDePesquisa, nomePessoa);
         }
 
         public void PesquisarPessoaEConfirmar(TipoPessoa tipoPessoa, string nomePessoa)
         {
-            _manipuladorService.ConfirmarSeElementoExisteName(RetornarTipoDeTelaDePesquisa(tipoPessoa));
-            _manipuladorService.DigitarNoCampoIdEApertarEnterEF5(CampoParametroDePesquisa, nomePessoa);
+            try
+            {
+                _manipuladorService.ElementoExisteNaTela(RetornarTipoDeTelaDePesquisa(tipoPessoa));
+                _manipuladorService.DigitarNoCampoIdEApertarEnterEF5(CampoParametroDePesquisa, nomePessoa);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Falha ao pesquisar {tipoPessoa} e confirmar! {ex.Message}");
+            }
         }
 
         public bool VerificarSeCarregouOsDadosDaPessoa(string campoDaPessoa, string nomeDaPessoa) =>

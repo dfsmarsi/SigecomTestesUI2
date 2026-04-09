@@ -20,6 +20,5 @@
         public string Contato => "17991234567";
         public string ObservacaoContato => "CELULAR";
         public string AvisoDeVenda => "AVISO DE VENDA";
-        public string SqlCadastroDeGrupoDeDesconto => "insert into pessoa_grupo (nomegrupo, desconto_maximo) values ('grupo teste', 15.00)";
     }
 }

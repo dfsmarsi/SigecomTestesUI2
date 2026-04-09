@@ -1,8 +1,8 @@
-﻿namespace SigecomTestesUI2
+namespace SigecomTestesUI2
 {
     public class LoginDados
     {
-        public string Usuario = "TESTE";
-        public string Senha = "1";
+        public string Usuario { get; } = Configuracao.Instancia["Login:Usuario"]!;
+        public string Senha { get; } = Configuracao.Instancia["Login:Senha"]!;
     }
 }

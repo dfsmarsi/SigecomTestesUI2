@@ -1,11 +1,11 @@
-﻿using OpenQA.Selenium.Appium.Windows;
+﻿using SigecomTestesUI2.Services;
 
 namespace SigecomTestesUI2.Pages.Vendas.Orcamento
 {
     public class ConsultaDeOrcamentoPage : PageBase
     {
-        public ConsultaDeOrcamentoPage(WindowsDriver<WindowsElement> driver) : base(driver)
-        {            
+        public ConsultaDeOrcamentoPage(ManipuladorService manipuladorService) : base(manipuladorService)
+        {
         }
 
         private const string BotaoMenuVendas = "Vendas";
@@ -14,6 +14,14 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
         private const string BotaoNovoOrcamento = "Novo orçamento";
         private const string BotaoAlterar = "Alterar";
         private const string BotaoFaturar = "Faturar";
+
+        public OrcamentoPage AcessarTelaDeConsultaDeOrcamento()
+        {
+            _manipuladorService.ClicarNoBotaoName(BotaoMenuVendas);
+            _manipuladorService.ClicarNoBotaoName(BotaoSubMenuConsultarOrcamentos);
+            _manipuladorService.EsperarElementoName(TelaConsultaDeOrcamentos);
+            return new OrcamentoPage(_manipuladorService);
+        }
 
         public bool RealizarNovoOrçamento(string valorDoItem)
         {
