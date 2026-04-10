@@ -8,12 +8,13 @@ namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento
 {
     public class OrcamentoTeste : TesteBase
     {
-        private string? _configOriginal;
+        private IConfigBackup? _configBackup;
 
         [Test(Description = "Faturamento detalhado de orçamento")]
         public void FaturamentoDetalhadoDeOrcamento()
         {
-            _configOriginal = ConfigDbSetup.ObterGeralImpressao(AcessoDB);
+            _configBackup = new EmpresaHostConfigBackup(AcessoDB);
+            _configBackup.Salvar("geral_impressao");
             ConfigDbSetup.HabilitarFaturamentoDetalhado(AcessoDB);
             var orcamentoModel = new OrcamentoTesteModel();
 
@@ -82,12 +83,14 @@ namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento
         [TearDown]
         public new void TearDown()
         {
-            if (_configOriginal != null)
+            try
             {
-                ConfigDbSetup.RestaurarGeralImpressao(AcessoDB, _configOriginal);
-                _configOriginal = null;
+                _configBackup?.RestaurarTudo();
             }
-            base.TearDown();
+            finally
+            {
+                base.TearDown();
+            }
         }
     }
 }

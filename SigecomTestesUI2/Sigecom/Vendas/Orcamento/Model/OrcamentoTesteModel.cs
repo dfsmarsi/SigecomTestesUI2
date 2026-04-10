@@ -10,7 +10,7 @@ namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento.Model
         public int PosicaoTipoOrcamento => 1;
         public int PosicaoStatusOrcamento => 1;
         public string StatusAposFaturamento => "APROVADO";
-        public string TelaOrcamentoName => "OrÁamento";
-        public string TelaDeConsultaName => "Consulta de orÁamentos";
+        public string TelaOrcamentoName => "Or√ßamento";
+        public string TelaDeConsultaName => "Consulta de or√ßamentos";
     }
 }
