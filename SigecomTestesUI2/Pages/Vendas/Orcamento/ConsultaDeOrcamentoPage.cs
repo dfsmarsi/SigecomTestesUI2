@@ -14,16 +14,81 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
         private const string BotaoNovoOrcamento = "Novo orçamento";
         private const string BotaoAlterar = "Alterar";
         private const string BotaoFaturar = "Faturar";
+        private const string BotaoFiltroAvancadoName = ", Avançado";
+        private const string BotaoFiltroName = "Filtro";
+        private const string CampoObservacaoFiltroId = "txtObservacao";
+        private const string ColunaObservacaoNaGridName = "Observação";
+        private const string ColunaStatusNaGridName = "Status";
+        private const string GridAcoesId = "gridAcoes";
 
-        public OrcamentoPage AcessarTelaDeConsultaDeOrcamento()
+        public ConsultaDeOrcamentoPage AcessarTelaDeConsultaDeOrcamento()
         {
             _manipuladorService.ClicarNoBotaoName(BotaoMenuVendas);
             _manipuladorService.ClicarNoBotaoName(BotaoSubMenuConsultarOrcamentos);
             _manipuladorService.EsperarElementoName(TelaConsultaDeOrcamentos);
-            return new OrcamentoPage(_manipuladorService);
+            return this;
         }
 
-        public bool RealizarNovoOrçamento(string valorDoItem)
+        public void AbrirFiltroAvancado()
+        {
+            try
+            {
+                _manipuladorService.ClicarNoBotaoName(BotaoFiltroAvancadoName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao abrir o filtro avançado: {ex.Message}");
+            }
+        }
+
+        public void PesquisarPorObservacao(string observacao)
+        {
+            try
+            {
+                _manipuladorService.DigitarNoCampoIdEApertarEnter(CampoObservacaoFiltroId, observacao);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao pesquisar por observação: {ex.Message}");
+            }
+        }
+
+        public string ObterObservacaoDaGrid()
+        {
+            return _manipuladorService.PegarValorDaColunaDaGrid(ColunaObservacaoNaGridName);
+        }
+
+        public string ObterStatusDaGridAposFaturamento(string observacao)
+        {
+            var posicao = _manipuladorService.RetornarPosicaoDoRegistroDesejado(ColunaObservacaoNaGridName, observacao);
+            return _manipuladorService.PegarValorDaColunaDaGridNaPosicao(ColunaStatusNaGridName, posicao.ToString());
+        }
+
+        public void SelecionarOrcamentoNaGrid(string observacao)
+        {
+            try
+            {
+                _manipuladorService.ClicarNoElementoDaGridComVarios(ColunaObservacaoNaGridName, observacao);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao selecionar o orçamento na grid: {ex.Message}");
+            }
+        }
+
+        public void FaturarOrcamentoSemImpressao()
+        {
+            try
+            {
+                _manipuladorService.ClicarNoBotaoName(BotaoFaturar);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao faturar o orçamento: {ex.Message}");
+            }
+        }
+
+        public bool RealizarNovoOrcamento(string valorDoItem)
         {
             try
             {
@@ -36,7 +101,30 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
                 Console.WriteLine(ex.Message);
                 return false;
             }
+        }
 
+        public void FecharTelaDeConsultaDeOrcamentoComEsc(string telaDeConsultaName)
+        {
+            try
+            {
+                _manipuladorService.FecharJanelaComEscName(telaDeConsultaName);   
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao fechar a tela de consulta de orçamento: {ex.Message}");
+            }
+        }
+
+        internal void AbrirFiltroLateral()
+        {
+            try
+            {
+                _manipuladorService.ClicarNoBotaoName(BotaoFiltroName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao abrir o filtro lateral: {ex.Message}");
+            }
         }
     }
 }
