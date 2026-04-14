@@ -44,7 +44,7 @@ namespace SigecomTestesUI2.Services
             throw new TimeoutException($"Timeout de {timeoutSegundos}s atingido aguardando condição.");
         }
 
-        public void EsperarSplashs()
+        public void Esperar2Segundos()
         {
             Thread.Sleep(TimeSpan.FromSeconds(2));
         }

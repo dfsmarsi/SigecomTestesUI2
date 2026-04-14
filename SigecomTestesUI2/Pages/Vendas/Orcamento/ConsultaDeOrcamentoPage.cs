@@ -76,7 +76,7 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
             }
         }
 
-        public void FaturarOrcamentoSemImpressao()
+        public void ClicarEmFaturarOrcamento()
         {
             try
             {

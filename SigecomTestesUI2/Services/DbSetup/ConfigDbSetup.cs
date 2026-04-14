@@ -32,5 +32,21 @@ namespace SigecomTestesUI2.Services.DbSetup
             AlterarPropriedadeJson(acessoDB, "empresa_host_config", "geral_impressao",
                 "FaturamentoRapido", false);
         }
+
+        public static bool VerificarPropriedadeJson(AcessoDB acessoDB, string tabela, string coluna,
+            string propriedade, JsonNode valorEsperado, string? filtro = null)
+        {
+            var where = string.IsNullOrEmpty(filtro) ? "" : $" WHERE {filtro}";
+            var jsonAtual = acessoDB
+                .RealizarConsulta($"SELECT {coluna} FROM {tabela}{where}")
+                .Rows[0][0].ToString()!;
+
+            var json = JsonNode.Parse(jsonAtual)!;
+            var valorAtual = json[propriedade];
+
+            return valorAtual is not null &&
+                   valorAtual.ToJsonString() == valorEsperado.ToJsonString();
+        }
+
     }
 }
