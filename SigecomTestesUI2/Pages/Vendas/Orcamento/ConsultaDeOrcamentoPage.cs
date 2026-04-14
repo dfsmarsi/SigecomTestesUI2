@@ -19,7 +19,7 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
         private const string CampoObservacaoFiltroId = "txtObservacao";
         private const string ColunaObservacaoNaGridName = "Observação";
         private const string ColunaStatusNaGridName = "Status";
-        private const string GridAcoesId = "gridAcoes";
+        private const string ColunaValorNaGridName = "Total";
 
         public ConsultaDeOrcamentoPage AcessarTelaDeConsultaDeOrcamento()
         {
@@ -56,6 +56,11 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
         public string ObterObservacaoDaGrid()
         {
             return _manipuladorService.PegarValorDaColunaDaGrid(ColunaObservacaoNaGridName);
+        }
+
+        public string ObterValorTotalDaGrid()
+        {
+            return _manipuladorService.PegarValorDaColunaDaGrid(ColunaValorNaGridName);
         }
 
         public string ObterStatusDaGridAposFaturamento(string observacao)

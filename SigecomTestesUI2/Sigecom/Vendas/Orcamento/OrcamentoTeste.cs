@@ -1,7 +1,9 @@
 using SigecomTestesUI2.Enum;
 using SigecomTestesUI2.Pages.Pesquisas;
 using SigecomTestesUI2.Pages.Vendas.Orcamento;
-using SigecomTestesUI2.Services.DbSetup;
+using SigecomTestesUI2.Services.DbSetup.Configuracao;
+using SigecomTestesUI2.Services.DbSetup.Configuracao.Backup;
+using SigecomTestesUI2.Services.DbSetup.Configuracao.Estacao;
 using SigecomTestesUI2.Sigecom.Vendas.Orcamento.Model;
 
 namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento
@@ -15,7 +17,7 @@ namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento
         {
             _configBackup = new EmpresaHostConfigBackup(AcessoDB);
             _configBackup.Salvar("geral_impressao");
-            ConfigDbSetup.HabilitarFaturamentoDetalhado(AcessoDB);
+            EstacaoOrcamentoDbSetup.HabilitarFaturamentoDetalhado(AcessoDB);
             var orcamentoModel = new OrcamentoTesteModel();
 
             // Reabrir o sistema para carregar a config alterada
@@ -89,7 +91,7 @@ namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento
             {
                 _configBackup = new EmpresaHostConfigBackup(AcessoDB);
                 _configBackup.Salvar("geral_impressao");
-                ConfigDbSetup.DesabilitarFaturamentoDetalhado(AcessoDB);
+                EstacaoOrcamentoDbSetup.DesabilitarFaturamentoDetalhado(AcessoDB);
                 RelogarNoSistema();
             }
 
@@ -146,6 +148,86 @@ namespace SigecomTestesUI2.Sigecom.Vendas.Orcamento
                 "O status do orçamento não foi alterado após o faturamento.");
 
             consultaPage.FecharTelaDeConsultaDeOrcamentoComEsc(orcamentoModel.TelaDeConsultaName);
+        }
+
+        [Test(Description = "Orçamento com desconto em reais e faturamento rápido")]
+        public void OrcamentoComDescontoEmReaisEFaturamentoRapido()
+        {
+            var dados = new OrcamentoComDescontoTesteModel();
+
+            if (!ConfigDbSetup.VerificarPropriedadeJson(AcessoDB, "empresa_host_config", "geral_impressao", "FaturamentoRapido", false))
+            {
+                _configBackup = new EmpresaHostConfigBackup(AcessoDB);
+                _configBackup.Salvar("geral_impressao");
+                EstacaoOrcamentoDbSetup.DesabilitarFaturamentoDetalhado(AcessoDB);
+                RelogarNoSistema();
+            }
+
+            // Criar orçamento
+            var orcamentoPage = new OrcamentoPage(ManipuladorService).AbrirFluxoOrcamentoDock();
+
+            orcamentoPage.AbrirPesquisaDeCliente();
+
+            var pesquisaDeClientePage = new PesquisaDePessoaPage(ManipuladorService);
+            pesquisaDeClientePage.PesquisarPessoaEConfirmar(TipoPessoa.Cliente, dados.NomeCliente);
+
+            orcamentoPage.ConferirVendedorSelecionado(dados.NomeVendedor);
+            orcamentoPage.DigitarNomeDoProdutoNaPesquisa(dados.NomeProdutoTestePadrao);
+
+            // Alterar valor unitário para garantir que seja maior que o desconto
+            orcamentoPage.AlterarValorUnitarioDoProdutoNaGrid(dados.ValorUnitario);
+
+            // Aplicar desconto de R$ 2,55 (quantidade permanece 1)
+            orcamentoPage.AlterarDescontoDoProdutoNaGrid(dados.DescontoReais);
+
+            // Conferir total na grid do orçamento
+            var valorTotalNaGrid = orcamentoPage.ObterValorTotalDoProdutoNaGrid();
+            Assert.AreEqual(dados.ValorTotalEsperado, valorTotalNaGrid,
+                "O valor total do produto não corresponde ao esperado após aplicar o desconto.");
+
+            // Avançar para informar tipo, status e observação
+            orcamentoPage.AvancarParaProximaEtapa();
+            orcamentoPage.SelecionarTipoOrcamento(dados.PosicaoTipoOrcamento);
+            orcamentoPage.SelecionarStatusOrcamento(dados.PosicaoStatusOrcamento);
+            orcamentoPage.DigitarObservacao(dados.Observacao);
+
+            // Avançar e concluir sem impressão
+            orcamentoPage.AvancarParaProximaEtapa();
+            orcamentoPage.ConcluirOrcamentoSemImpressao();
+            orcamentoPage.FecharTelaDeOrcamentoComEsc(dados.TelaOrcamentoName);
+
+            // Acessar tela de consulta de orçamentos
+            var consultaPage = new ConsultaDeOrcamentoPage(ManipuladorService).AcessarTelaDeConsultaDeOrcamento();
+
+            // Filtrar por observação no filtro avançado
+            consultaPage.AbrirFiltroLateral();
+            consultaPage.AbrirFiltroAvancado();
+            consultaPage.PesquisarPorObservacao(dados.Observacao);
+
+            var observacaoNaGrid = consultaPage.ObterObservacaoDaGrid();
+            Assert.AreEqual(dados.Observacao, observacaoNaGrid,
+                "A observação na grid não corresponde à do orçamento criado.");
+
+            // Conferir se o valor na consulta corresponde ao total com desconto
+            var valorNaConsulta = consultaPage.ObterValorTotalDaGrid();
+            Assert.AreEqual(dados.ValorTotalEsperadoConsulta, valorNaConsulta,
+                "O valor do orçamento na consulta não corresponde ao esperado com o desconto aplicado.");
+
+            // Faturar o orçamento (fluxo rápido)
+            consultaPage.SelecionarOrcamentoNaGrid(dados.Observacao);
+            ManipuladorService.Esperar2Segundos();
+            consultaPage.ClicarEmFaturarOrcamento();
+            ManipuladorService.Esperar2Segundos();
+            orcamentoPage.SelecionarPagamentoEmDinheiro();
+
+            ManipuladorService.Esperar2Segundos();
+
+            // Conferir se o status foi alterado para Faturado
+            var statusAtual = consultaPage.ObterStatusDaGridAposFaturamento(dados.Observacao);
+            Assert.AreEqual(dados.StatusAposFaturamento, statusAtual,
+                "O status do orçamento não foi alterado após o faturamento.");
+
+            consultaPage.FecharTelaDeConsultaDeOrcamentoComEsc(dados.TelaDeConsultaName);
         }
 
         [TearDown]

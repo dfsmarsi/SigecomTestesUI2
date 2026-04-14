@@ -1,4 +1,4 @@
-namespace SigecomTestesUI2.Services.DbSetup
+namespace SigecomTestesUI2.Services.DbSetup.Cadastros
 {
     public static class CadastroDbSetup
     {
@@ -14,11 +14,6 @@ namespace SigecomTestesUI2.Services.DbSetup
             var consulta = acessoDB.RealizarConsulta($"SELECT * FROM pessoa_grupo WHERE nomegrupo = '{nomeGrupo}' AND desconto_maximo = {descontoMaximo.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
             if (consulta.Rows.Count == 0)
                 acessoDB.ExecutarScript($"INSERT INTO pessoa_grupo (nomegrupo, desconto_maximo) VALUES ('{nomeGrupo}', {descontoMaximo.ToString(System.Globalization.CultureInfo.InvariantCulture)})");
-        }
-
-        public static void LimparCategoriaPorNome(AcessoDB acessoDB, string nome)
-        {
-            acessoDB.ExecutarScript($"DELETE FROM GRUPO_PRODUTO WHERE DESCRICAO = '{nome}'");
         }
 
         public static void DesativarPessoaComCpfSeExistir(AcessoDB acessoDB, string cpfFormatado)

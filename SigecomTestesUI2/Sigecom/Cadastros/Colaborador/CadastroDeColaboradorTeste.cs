@@ -1,6 +1,6 @@
 using SigecomTestesUI2.Pages.Cadastros.Pessoa;
 using SigecomTestesUI2.Pages.Pesquisas;
-using SigecomTestesUI2.Services.DbSetup;
+using SigecomTestesUI2.Services.DbSetup.Cadastros;
 using SigecomTestesUI2.Sigecom.Cadastros.Colaborador.Model;
 
 namespace SigecomTestesUI2.Sigecom.Cadastros.Colaborador

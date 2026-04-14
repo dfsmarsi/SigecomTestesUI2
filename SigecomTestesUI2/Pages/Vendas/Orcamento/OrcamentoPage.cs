@@ -16,7 +16,10 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
         private const string CampoPesquisaDeProdutoId = "scProdutos";
         private const string CampoNomeProdutoNaGridName = "Descrição";
         private const string CampoQtdeProdutoNaGridName = "Qtde";
+        private const string CampoUnitarioProdutoNaGridName = "Unitário";
+        private const string CampoDescontoProdutoNaGridName = "Desconto (R$)";
         private const string CampoTotalProdutoNaGridName = "Total";
+        private const string LabelTotalPagarId = "lblTotalPagar";
         private const string BotaoAvancarName = ", Avançar";
         private const string CampoTipoOrcamentoId = "cbxTipo";
         private const string CampoStatusOrcamentoId = "cbxStatus";
@@ -87,9 +90,43 @@ namespace SigecomTestesUI2.Pages.Vendas.Orcamento
             }
         }
 
+        public void AlterarValorUnitarioDoProdutoNaGrid(string valorUnitario)
+        {
+            try
+            {
+                _manipuladorService.EditarItensNaGridComDuploClickComTab(CampoUnitarioProdutoNaGridName, valorUnitario);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao alterar o valor unitário do produto na grid: {ex.Message}");
+            }
+        }
+
+        public string ObterValorUnitarioDoProdutoNaGrid()
+        {
+            return _manipuladorService.PegarValorDaColunaDaGrid(CampoUnitarioProdutoNaGridName);
+        }
+
+        public void AlterarDescontoDoProdutoNaGrid(string desconto)
+        {
+            try
+            {
+                _manipuladorService.EditarItensNaGridComDuploClickComTab(CampoDescontoProdutoNaGridName, desconto);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao alterar o desconto do produto na grid: {ex.Message}");
+            }
+        }
+
         public string ObterValorTotalDoProdutoNaGrid()
         {
             return _manipuladorService.PegarValorDaColunaDaGrid(CampoTotalProdutoNaGridName);
+        }
+
+        public string ObterTotalAPagar()
+        {
+            return _manipuladorService.ObterValorElementoId(LabelTotalPagarId);
         }
 
         public void AvancarParaProximaEtapa()

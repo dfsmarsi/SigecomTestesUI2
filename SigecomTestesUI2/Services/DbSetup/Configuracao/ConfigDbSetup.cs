@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace SigecomTestesUI2.Services.DbSetup
+namespace SigecomTestesUI2.Services.DbSetup.Configuracao
 {
     public static class ConfigDbSetup
     {
@@ -19,18 +19,6 @@ namespace SigecomTestesUI2.Services.DbSetup
 
             acessoDB.ExecutarScript(
                 $"UPDATE {tabela} SET {coluna} = '{jsonAtualizado}'{where}");
-        }
-
-        public static void HabilitarFaturamentoDetalhado(AcessoDB acessoDB)
-        {
-            AlterarPropriedadeJson(acessoDB, "empresa_host_config", "geral_impressao",
-                "FaturamentoRapido", true);
-        }
-
-        public static void DesabilitarFaturamentoDetalhado(AcessoDB acessoDB)
-        {
-            AlterarPropriedadeJson(acessoDB, "empresa_host_config", "geral_impressao",
-                "FaturamentoRapido", false);
         }
 
         public static bool VerificarPropriedadeJson(AcessoDB acessoDB, string tabela, string coluna,
